@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,11 +35,13 @@ import com.bolsadeideas.springboot.app.util.paginator.PageRender;
 @SessionAttributes("cliente") // permite setear el objeto cliente en la session
 public class ClienteController {
 
+	private final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
+
 	@Autowired
 	private IClienteService clienteService;
 
 	@GetMapping(value = "/ver/{id}")
-	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model ,RedirectAttributes flash) {
+	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 
 		Cliente cliente = clienteService.findOne(id);
 
@@ -45,7 +49,7 @@ public class ClienteController {
 			flash.addFlashAttribute("error", "ID Cliente no existe en bd ");
 			return "redirect:listar";
 
-		} 
+		}
 		model.put("titulo", "Detalle Cliente");
 		model.put("cliente", cliente);
 		return "ver";
@@ -85,14 +89,28 @@ public class ClienteController {
 		}
 
 		if (!foto.isEmpty()) {
-			Path directorioRecursos = Paths.get("src//main//resources//static//uploads");
-			String rootPath = directorioRecursos.toFile().getAbsolutePath();
+			/**
+			 * Path directorioRecursos = Paths.get("src//main//resources//static//uploads");
+			 **/
+			/**
+			 * Directorio fisica en donde se almacenan los archivos que va a amenjar las
+			 * aplicaciones
+			 *
+			 * **/
+			 String rootPath = "D://ImagenesSpringMvc5";
+			 
+			/**
+			 * Se genera un nombre unico para la imagen subida 
+			 * */	
+			String uniqueFileName = UUID.randomUUID().toString()+"_"+foto.getOriginalFilename();
+			
+	
 			try {
 				byte[] bytes = foto.getBytes();
-				Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
+				Path rutaCompleta = Paths.get(rootPath + "//" + uniqueFileName);
 				Files.write(rutaCompleta, bytes);
-				flash.addFlashAttribute("info", "Has subido corectamente '" + foto.getOriginalFilename() + "'");
-				cliente.setFoto(foto.getOriginalFilename());
+				flash.addFlashAttribute("info", "Has subido corectamente '" + uniqueFileName + "'");
+				cliente.setFoto(uniqueFileName);
 			} catch (IOException e) {
 				e.printStackTrace();
 
@@ -106,7 +124,6 @@ public class ClienteController {
 		clienteService.save(cliente);
 		status.setComplete();
 		flash.addFlashAttribute("success", msgFlash);
-		// flash.addFlashAttribute("warning", msgFlash);
 		return "redirect:/listar";
 	}
 
