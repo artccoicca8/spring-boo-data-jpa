@@ -57,10 +57,27 @@
 						<label for="buscar_producto" class="col-sm-2 col-form-label"
 							th:text="'Buscar Producto '"></label>
 						<div class="col-sm-6">
-							<input type="text"  name="buscar_producto" id="buscar_producto" class="form-control"/>
+							<input type="text" name="buscar_producto" id="buscar_producto"
+								class="form-control" />
 						</div>
 					</div>
 
+
+					<table th:replace="factura/plantilla-items :: itemsFactura"></table>
+					<table id="cargarItemProductos"
+						class="table table-sm table-striped table-hover">
+						<thead>
+							<tr>
+								<th>Nombre</th>
+								<th>Precio</th>
+								<th>Cantidad</th>
+								<th>Total</th>
+								<th>Eliminar</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
 
 
 					<div class="form-group row">
